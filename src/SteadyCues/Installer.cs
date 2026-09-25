@@ -102,6 +102,7 @@ namespace SteadyCues
                 k.SetValue("DisplayIcon", InstalledExe + ",0");
                 k.SetValue("InstallLocation", InstallDir);
                 k.SetValue("UninstallString", "\"" + InstalledExe + "\" --uninstall");
+                k.SetValue("QuietUninstallString", "\"" + InstalledExe + "\" --uninstall --quiet");
                 k.SetValue("URLInfoAbout", Program.Website);
                 k.SetValue("NoModify", 1, RegistryValueKind.DWord);
                 k.SetValue("NoRepair", 1, RegistryValueKind.DWord);

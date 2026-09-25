@@ -3,24 +3,60 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SteadyCues · Motion cues for Windows</title>
-    <meta name="description" content="Free, open-source vehicle motion cues for Windows. Softly moving dots at the edges of your screen follow the car's motion to help reduce car sickness when you read or work as a passenger." />
+    <title>SteadyCues · Read in the car without feeling sick (free for Windows)</title>
+    <meta name="description" content="SteadyCues is a free, open-source app for Windows that helps prevent car sickness. Softly moving dots at the edges of your screen follow the car's motion, like Vehicle Motion Cues on iPhone. Works with any laptop using your phone as the sensor." />
+    <meta name="keywords" content="car sickness, motion sickness, vehicle motion cues, Windows, laptop, reading in the car, passenger, accessibility, open source" />
+    <link rel="canonical" href="https://steadycues.vercel.app/" />
     <meta name="theme-color" content="#f4f5f2" />
     <meta name="color-scheme" content="light" />
-    <meta property="og:title" content="SteadyCues · Motion cues for Windows" />
-    <meta property="og:description" content="Softly moving dots that follow the car, so you can read on the road without feeling sick. Free and open source." />
+
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="./icon-256.png" />
+    <meta property="og:site_name" content="SteadyCues" />
+    <meta property="og:url" content="https://steadycues.vercel.app/" />
+    <meta property="og:title" content="SteadyCues · Read in the car without feeling sick" />
+    <meta property="og:description" content="Softly moving dots at the edges of your screen follow the road, so what you see matches what you feel. Free and open source for Windows." />
+    <meta property="og:image" content="https://steadycues.vercel.app/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="SteadyCues: moving dots at the edges of a laptop screen, over a winding mountain road" />
+    <meta property="og:video" content="https://steadycues.vercel.app/media/steadycues-demo.mp4" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SteadyCues · Read in the car without feeling sick" />
+    <meta name="twitter:description" content="Free, open-source motion cues for Windows. Moving dots at the screen edges follow the road." />
+    <meta name="twitter:image" content="https://steadycues.vercel.app/og.png" />
+
     <link rel="icon" type="image/png" sizes="32x32" href="./icon-32.png" />
     <link rel="icon" type="image/png" sizes="64x64" href="./icon-64.png" />
     <link rel="apple-touch-icon" href="./icon-256.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://images.unsplash.com" />
     <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "SteadyCues",
+        "description": "Free, open-source vehicle motion cues for Windows. Moving dots at the edges of the screen follow the car's motion to help passengers read without getting car sick.",
+        "applicationCategory": "UtilitiesApplication",
+        "applicationSubCategory": "Accessibility",
+        "operatingSystem": "Windows 10, Windows 11",
+        "softwareVersion": "1.1.1",
+        "fileSize": "356KB",
+        "downloadUrl": "https://github.com/Aweswomedude1234/motion-cues/releases/latest/download/SteadyCues.exe",
+        "url": "https://steadycues.vercel.app/",
+        "image": "https://steadycues.vercel.app/og.png",
+        "license": "https://opensource.org/licenses/MIT",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "codeRepository": "https://github.com/Aweswomedude1234/motion-cues"
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
-    <noscript>SteadyCues: free vehicle motion cues for Windows. Download from GitHub Releases.</noscript>
+    <noscript>SteadyCues: free vehicle motion cues for Windows. Download from GitHub Releases: https://github.com/Aweswomedude1234/motion-cues/releases/latest</noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

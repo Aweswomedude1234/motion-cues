@@ -16,6 +16,7 @@ import {
   ShieldCheck, SlidersHorizontal, Smartphone, Sparkles,
 } from 'lucide-react';
 import {CueShowcase} from './components/CueShowcase';
+import {StarButton} from './components/StarButton';
 import {
   DOWNLOAD_URL, ISSUES_URL, LICENSE_URL, PHOTO_CREDIT, PHOTO_PAGE, RELEASES_URL, REPO_URL, VERSION, photo,
 } from './site';
@@ -115,9 +116,11 @@ function Nav() {
         <Link href="#setup" color="primary" size="sm">Setup</Link>
         <Link href="#features" color="primary" size="sm">Features</Link>
         <Link href="#faq" color="primary" size="sm">FAQ</Link>
-        <Link href={REPO_URL} color="primary" size="sm">GitHub</Link>
       </div>
-      <DownloadButton size="sm" />
+      <HStack gap={2} vAlign="center">
+        <span className="nav-star"><StarButton /></span>
+        <DownloadButton size="sm" />
+      </HStack>
     </nav>
   );
 }
@@ -164,6 +167,19 @@ export function App() {
     <>
       <Hero />
       <main>
+        {/* Demo video */}
+        <Band id="demo" label="Demo video">
+          <VStack gap={8}>
+            <SectionIntro eyebrow="Demo" title="See it in 40 seconds.">
+              A scripted drive through the hills: watch how the dots answer every start, bend and stop.
+            </SectionIntro>
+            <video className="demo-video" controls playsInline preload="none" poster="./media/steadycues-demo-poster.jpg"
+              aria-label="SteadyCues demo video">
+              <source src="./media/steadycues-demo.mp4" type="video/mp4" />
+            </video>
+          </VStack>
+        </Band>
+
         {/* How it works */}
         <Band id="how" label="How it works">
           <VStack gap={10}>
@@ -317,7 +333,7 @@ export function App() {
                 <Text type="large" color="secondary">Free forever. MIT licensed. Built in the open.</Text>
                 <HStack gap={3} wrap="wrap" hAlign="center">
                   <DownloadButton />
-                  <Button label="All releases" variant="secondary" size="lg" href={RELEASES_URL} />
+                  <StarButton size="lg" label="Star on GitHub" />
                 </HStack>
               </div>
             </MediaTheme>

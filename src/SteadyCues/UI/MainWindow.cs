@@ -311,10 +311,10 @@ namespace SteadyCues.UI
             _uninstallBtn.Click += delegate { _app.Uninstall(this); };
 
             _about = MakeLabel("SteadyCues " + Program.Version + " · free and open source (MIT license)", 9f, FontStyle.Regular, Theme.Muted);
-            _links = MakeLink("Website   ·   Source code   ·   Report a problem");
+            _links = MakeLink("Website   ·   Star on GitHub   ·   Report a problem");
             _links.Links.Clear();
             AddLink(_links, "Website", Program.Website);
-            AddLink(_links, "Source code", Program.Repository);
+            AddLink(_links, "Star on GitHub", Program.Repository);
             AddLink(_links, "Report a problem", Program.Repository + "/issues/new/choose");
             _links.LinkClicked += (s, e) => Open((string)e.Link.LinkData);
 

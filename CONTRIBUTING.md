@@ -28,6 +28,8 @@ Useful flags when running a build:
 | `--loopback` | Phone link listens on 127.0.0.1 only (no firewall prompt while developing) |
 | `--demo` | Start a demo drive immediately |
 | `--background` | Start in the tray without opening the window |
+| `--install` | Silent per-user install, then exit (used by winget) |
+| `--uninstall [--quiet]` | Remove SteadyCues; `--quiet` skips the confirmation dialogs |
 
 Because the compiler is C# 5, please stick to C# 5 syntax (no `?.`, `$""`, `=>` members, or
 `out var`). Keep the app dependency-free: one exe, nothing to install.

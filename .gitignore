@@ -15,3 +15,13 @@ Thumbs.db
 
 # Local tool settings
 .claude/
+
+# Local growth stats written by tools/stats.ps1
+tools/stats-history.csv
+
+# Private launch plan and post drafts (not published)
+marketing/
+
+# Rendered video output
+tools/video/out/
+tools/video/node_modules/

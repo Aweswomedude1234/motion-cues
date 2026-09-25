@@ -1,0 +1,12 @@
+{
+  "name": "steadycues-demo-video",
+  "private": true,
+  "type": "module",
+  "description": "Renders the SteadyCues demo video (16:9, 9:16 and a README GIF) with headless Chrome and ffmpeg.",
+  "scripts": {
+    "render": "node render.mjs"
+  },
+  "dependencies": {
+    "puppeteer-core": "^25.12.0"
+  }
+}

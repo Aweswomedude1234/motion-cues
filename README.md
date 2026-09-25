@@ -4,21 +4,31 @@
 
 # SteadyCues
 
-**Vehicle motion cues for Windows.** Softly moving dots at the edges of your screen follow the car,
-so what you see agrees with what you feel, and reading on the road is easier.
+**Read in the car without feeling sick.** Softly moving dots at the edges of your screen follow
+the car, so what you see agrees with what you feel. Vehicle motion cues, like on iPhone, for Windows.
 
-[**Download for Windows**](https://github.com/Aweswomedude1234/motion-cues/releases/latest/download/SteadyCues.exe)
-&nbsp;·&nbsp; [Website](https://steadycues.vercel.app/)
-&nbsp;·&nbsp; [Releases](https://github.com/Aweswomedude1234/motion-cues/releases)
+[**⬇ Download for Windows**](https://github.com/Aweswomedude1234/motion-cues/releases/latest/download/SteadyCues.exe)
+&nbsp;·&nbsp; [Website](https://steadycues.vercel.app/?ref=github)
+&nbsp;·&nbsp; [▶ 40-second demo](https://steadycues.vercel.app/?ref=github#demo)
 &nbsp;·&nbsp; [Report a problem](https://github.com/Aweswomedude1234/motion-cues/issues)
 
+[![Downloads](https://img.shields.io/github/downloads/Aweswomedude1234/motion-cues/total?label=downloads&color=4b6340)](https://github.com/Aweswomedude1234/motion-cues/releases)
+[![Stars](https://img.shields.io/github/stars/Aweswomedude1234/motion-cues?style=flat&color=4b6340)](https://github.com/Aweswomedude1234/motion-cues/stargazers)
+[![Latest release](https://img.shields.io/github/v/release/Aweswomedude1234/motion-cues?color=4b6340)](https://github.com/Aweswomedude1234/motion-cues/releases/latest)
+[![Views](https://visitor-badge.laobi.icu/badge?page_id=Aweswomedude1234.motion-cues&left_text=views&left_color=%23555555&right_color=%234b6340)](https://github.com/Aweswomedude1234/motion-cues)
 [![CI](https://github.com/Aweswomedude1234/motion-cues/actions/workflows/ci.yml/badge.svg)](https://github.com/Aweswomedude1234/motion-cues/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Windows 10 and 11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078d4)
 
-<img src="website/public/screenshot-home.png" width="300" alt="SteadyCues home screen showing a connected phone and moving dots">
+<img src="press/steadycues-demo.gif" width="720" alt="Demo: dots at the edges of a laptop screen slide down as the car speeds up, sideways in bends and up when braking">
+
+<sub>No motion sensor in your laptop? Your phone becomes one: scan a code, tap Start.</sub>
+
+<img src="website/public/screenshot-home.png" width="280" alt="SteadyCues home screen showing a connected phone and moving dots">
 &nbsp;
-<img src="website/public/screenshot-pair.png" width="300" alt="Pairing a phone with a QR code">
+<img src="website/public/screenshot-pair.png" width="280" alt="Pairing a phone with a QR code">
+
+**If SteadyCues helps you, please ⭐ star the repo. It's how other car-sick passengers find it.**
 
 </div>
 
@@ -43,6 +53,7 @@ and don't show up in screenshots or screen sharing.
 ## Get started
 
 1. **[Download SteadyCues.exe](https://github.com/Aweswomedude1234/motion-cues/releases/latest/download/SteadyCues.exe)** and open it.
+   Or use a package manager: `scoop install https://raw.githubusercontent.com/Aweswomedude1234/motion-cues/main/packaging/scoop/steadycues.json`
    It installs itself for your account (no admin rights) and adds a Start menu entry.
    If Windows says the publisher is unknown, choose **More info → Run anyway**.
 2. **Tablet or 2-in-1?** SteadyCues finds its motion sensor automatically. You're done.
@@ -124,6 +135,12 @@ src/SteadyCues/
 tests/Tests.cs          test suite
 website/                project website (Astryx + React + Vite)
 ```
+
+## Star history
+
+<a href="https://star-history.com/#Aweswomedude1234/motion-cues&Date">
+  <img src="https://api.star-history.com/svg?repos=Aweswomedude1234/motion-cues&type=Date" alt="Star history chart" width="600">
+</a>
 
 ## Acknowledgements
 

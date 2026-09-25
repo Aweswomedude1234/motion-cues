@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SteadyCues demo video</title>
+<!--
+  The demo video, as a web page. render.mjs loads it in headless Chrome, calls renderFrame(t)
+  for every frame and pipes the screenshots into ffmpeg, so every frame is deterministic.
+  The dots use the same spring model and "felt force" convention as the Windows overlay.
+  Add ?format=vertical for the 9:16 cut. Open it in a browser with ?play to preview in real time.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=block" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f4f5f2; --ink: #161716; --muted: #595c57; --moss: #4b6340; --sage: #cfe0b8;
+    --u: calc(min(100vw, 100vh * 16 / 9) / 100); /* one "unit" = 1% of the 16:9 frame width */
+  }
+  :root.v { --u: calc(100vw / 62); }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: var(--paper); }
+  body { font-family: Figtree, system-ui, sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
+  .scene { position: absolute; inset: 0; opacity: 0; overflow: hidden; }
+
+  /* Shared pieces */
+  .photo { position: absolute; inset: -4%; background: center 58% / cover no-repeat; transform-origin: 50% 60%; }
+  .wash { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(244,245,242,.94) 0%, rgba(244,245,242,.72) 26%, rgba(244,245,242,.12) 54%, rgba(244,245,242,0) 70%); }
+  .dim { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(18,19,18,.35), rgba(18,19,18,.7)); }
+  .big { font-weight: 700; letter-spacing: -0.045em; line-height: 0.98; margin: 0; }
+  .line { opacity: 0; will-change: transform, opacity; }
+  .eyebrow { display: inline-flex; align-items: center; gap: calc(var(--u) * .6); font-weight: 600; font-size: calc(var(--u) * 1.25); }
+  .eyebrow i { width: calc(var(--u) * .6); height: calc(var(--u) * .6); border-radius: 50%; background: var(--moss); box-shadow: 0 0 0 calc(var(--u) * .3) rgba(75,99,64,.16); }
+
+  /* 1 — hook */
+  #s1 .copy { position: absolute; left: 0; right: 0; top: 17%; text-align: center; display: grid; gap: calc(var(--u) * 1.6); justify-items: center; }
+  #s1 .big { font-size: calc(var(--u) * 7.2); }
+  #s1 .sub { font-size: calc(var(--u) * 2.4); color: #3b3e39; font-weight: 500; }
+  .v #s1 .copy { top: 12%; padding: 0 6%; }
+
+  /* 2 — the problem */
+  #s2 { display: grid; grid-template-columns: 1.05fr 1fr; align-items: center; gap: 5%; padding: 0 8%; }
+  .v #s2 { grid-template-columns: 1fr; grid-template-rows: auto auto; align-content: center; padding: 0 7%; gap: calc(var(--u) * 6); }
+  #s2 .copy { display: grid; gap: calc(var(--u) * 2.2); }
+  #s2 .big { font-size: calc(var(--u) * 4.4); }
+  #s2 .big.moss { color: var(--moss); }
+  #s2 .cards { display: grid; grid-template-columns: 1fr 1fr; gap: calc(var(--u) * 1.6); }
+  .card { background: #fff; border-radius: calc(var(--u) * 1.4); padding: calc(var(--u) * 1.6); box-shadow: 0 calc(var(--u) * 1.4) calc(var(--u) * 4) calc(var(--u) * -1.6) rgba(22,23,22,.28); border: 1px solid rgba(22,23,22,.06); }
+  .card h4 { margin: calc(var(--u) * 1.2) 0 calc(var(--u) * .3); font-size: calc(var(--u) * 1.5); letter-spacing: -0.02em; }
+  .card p { margin: 0; color: var(--muted); font-size: calc(var(--u) * 1.1); }
+  .card svg { display: block; width: 100%; height: auto; border-radius: calc(var(--u) * .8); }
+
+  /* 3 — the product */
+  #s3 .title { position: absolute; left: 0; right: 0; top: 15%; display: grid; justify-items: center; text-align: center; }
+  #s3 .titlewash { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(244,245,242,.95) 0%, rgba(244,245,242,.8) 38%, rgba(244,245,242,0) 70%); }
+  #s3 .title .big { font-size: calc(var(--u) * 8); }
+  #s3 .title .tag { font-size: calc(var(--u) * 2.2); color: #3b3e39; margin-top: calc(var(--u) * 1.4); font-weight: 500; }
+  #s3 .stage { position: absolute; inset: 0; display: grid; justify-items: center; align-content: center; gap: calc(var(--u) * 1.4); }
+  .screen { position: relative; width: calc(var(--u) * 74); aspect-ratio: 16 / 9.4; border-radius: calc(var(--u) * 1.5); overflow: hidden;
+    background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.6); backdrop-filter: blur(calc(var(--u) * 1.4)) saturate(1.25);
+    box-shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 calc(var(--u) * 2.4) calc(var(--u) * 6) calc(var(--u) * -1.4) rgba(34,44,30,.5); }
+  .v .screen { width: calc(var(--u) * 58); aspect-ratio: 3 / 4.4; }
+  .bar { position: absolute; inset: 0 0 auto 0; height: calc(var(--u) * 2.3); display: flex; align-items: center; justify-content: space-between;
+    padding: 0 calc(var(--u) * 1); font-size: calc(var(--u) * .85); font-weight: 600; color: rgba(22,23,22,.78); background: rgba(255,255,255,.35); border-bottom: 1px solid rgba(255,255,255,.4); }
+  .bar span { display: inline-flex; align-items: center; gap: calc(var(--u) * .4); }
+  .bar img { width: calc(var(--u) * 1); border-radius: 22%; }
+  .reader { position: absolute; top: calc(var(--u) * 4); bottom: calc(var(--u) * -3); left: 50%; transform: translateX(-50%); width: 56%;
+    padding: calc(var(--u) * 2.4) calc(var(--u) * 3); background: #fff; border-radius: calc(var(--u) * 1) calc(var(--u) * 1) 0 0;
+    box-shadow: 0 calc(var(--u) * .8) calc(var(--u) * 3) rgba(22,23,22,.16); font-family: Newsreader, Georgia, serif; color: #262825; overflow: hidden;
+    -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent); }
+  .v .reader { width: 56%; }
+  .reader .k { font-family: Figtree, sans-serif; font-size: calc(var(--u) * .75); letter-spacing: .12em; text-transform: uppercase; color: var(--moss); margin: 0 0 calc(var(--u) * .3); }
+  .reader h3 { margin: 0 0 calc(var(--u) * .9); font-size: calc(var(--u) * 2.2); font-weight: 500; letter-spacing: -0.01em; }
+  .reader p { margin: 0 0 calc(var(--u) * .9); font-size: calc(var(--u) * 1.12); line-height: 1.6; }
+  .dots { position: absolute; left: 0; top: calc(var(--u) * 2.3); width: 100%; height: calc(100% - var(--u) * 2.3); }
+  .dock { display: flex; align-items: stretch; gap: calc(var(--u) * .5); padding: calc(var(--u) * .5); border-radius: calc(var(--u) * 1.5);
+    background: rgba(24,24,24,.78); backdrop-filter: blur(calc(var(--u) * 1.4)); color: #f2f2f2; margin-top: calc(var(--u) * -4.4); position: relative;
+    box-shadow: 0 calc(var(--u) * 1.2) calc(var(--u) * 3.4) calc(var(--u) * -.8) rgba(22,23,22,.55); }
+  .tile { display: flex; align-items: center; gap: calc(var(--u) * .8); padding: calc(var(--u) * .6) calc(var(--u) * 1.1); border-radius: calc(var(--u) * 1); background: rgba(255,255,255,.07); }
+  .tile.cap { width: calc(var(--u) * 26); font-size: calc(var(--u) * 1.05); line-height: 1.3; color: rgba(242,242,242,.9); }
+  .v .tile.cap { width: calc(var(--u) * 38); }
+  .gauge { width: calc(var(--u) * 3.4); height: calc(var(--u) * 3.4); }
+  .gauge circle.r { fill: none; stroke: rgba(242,242,242,.3); stroke-width: 1.2; }
+  .gauge circle.r2 { stroke-dasharray: 2 3; }
+  .gauge line { stroke: rgba(242,242,242,.16); }
+  .gauge .dot { fill: var(--sage); }
+  .chip { font-weight: 700; font-size: calc(var(--u) * 1.15); letter-spacing: -0.01em; white-space: nowrap; }
+
+  /* 4 — phone */
+  #s4 { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: calc(var(--u) * 4); padding: 0 7%; }
+  .v #s4 { grid-template-columns: 1fr; justify-items: center; align-content: center; gap: calc(var(--u) * 4); padding: 0 6%; }
+  #s4 .copy { display: grid; gap: calc(var(--u) * 1.6); }
+  .v #s4 .copy { text-align: center; justify-items: center; }
+  #s4 .big { font-size: calc(var(--u) * 4.6); }
+  #s4 .steps { display: grid; gap: calc(var(--u) * 1); margin-top: calc(var(--u) * 1); }
+  #s4 .step { display: flex; align-items: center; gap: calc(var(--u) * 1); font-size: calc(var(--u) * 1.7); font-weight: 600; }
+  #s4 .step b { display: grid; place-items: center; width: calc(var(--u) * 2.6); height: calc(var(--u) * 2.6); border-radius: 50%; background: rgba(75,99,64,.12); color: var(--moss); font-size: calc(var(--u) * 1.3); }
+  .appshot { position: relative; background: #202020; width: calc(var(--u) * 22); border-radius: calc(var(--u) * .8); overflow: hidden; box-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 5) calc(var(--u) * -2) rgba(22,23,22,.55); }
+  .appshot img { display: block; width: 100%; }
+  .appshot img + img { position: absolute; top: 0; left: 0; opacity: 0; }
+  .v .appshot { display: none; }
+  .phone { position: relative; width: calc(var(--u) * 19); aspect-ratio: 9 / 19; border-radius: calc(var(--u) * 2.8); background: #151515; padding: calc(var(--u) * .7);
+    box-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 5) calc(var(--u) * -2) rgba(22,23,22,.6); }
+  .v .phone { width: calc(var(--u) * 30); }
+  .phone iframe { width: 100%; height: 100%; border: 0; border-radius: calc(var(--u) * 2.2); background: #f3f3f3; }
+  .phone .notch { position: absolute; top: calc(var(--u) * 1.3); left: 50%; transform: translateX(-50%); width: 28%; height: calc(var(--u) * 1.3); border-radius: 99px; background: #151515; z-index: 2; }
+  .tap { position: absolute; width: calc(var(--u) * 4); height: calc(var(--u) * 4); border-radius: 50%; background: rgba(75,99,64,.35); border: 2px solid rgba(75,99,64,.7); transform: translate(-50%, -50%) scale(0); opacity: 0; z-index: 3; }
+  .scan { position: absolute; left: 7%; right: 7%; height: 2px; background: #6d8a5f; box-shadow: 0 0 calc(var(--u) * 1) #6d8a5f; opacity: 0; }
+
+  /* 5 — features */
+  #s5 { display: grid; align-content: center; padding: 0 12%; gap: calc(var(--u) * 3); }
+  .v #s5 { padding: 0 7%; }
+  #s5 .big { font-size: calc(var(--u) * 4.6); }
+  #s5 ul { list-style: none; margin: 0; padding: 0; display: grid; gap: calc(var(--u) * 1.5); }
+  #s5 li { display: flex; align-items: center; gap: calc(var(--u) * 1.4); font-size: calc(var(--u) * 2.3); font-weight: 600; letter-spacing: -0.02em; }
+  .v #s5 li { font-size: calc(var(--u) * 2.9); }
+  #s5 li svg { flex: none; width: calc(var(--u) * 2.6); height: calc(var(--u) * 2.6); }
+
+  /* 6 — end card */
+  #s6 .copy { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; text-align: center; gap: calc(var(--u) * 1.4); color: #fff; }
+  #s6 img.icon { width: calc(var(--u) * 7); border-radius: 24%; box-shadow: 0 calc(var(--u) * 1) calc(var(--u) * 3) rgba(0,0,0,.35); }
+  #s6 .big { font-size: calc(var(--u) * 7); }
+  #s6 .tag { font-size: calc(var(--u) * 2.2); color: rgba(255,255,255,.86); font-weight: 500; }
+  #s6 .pill { margin-top: calc(var(--u) * 1); background: #fff; color: var(--ink); font-weight: 700; font-size: calc(var(--u) * 1.9); padding: calc(var(--u) * 1) calc(var(--u) * 2.2); border-radius: 999px; letter-spacing: -0.01em; }
+  #s6 .gh { font-size: calc(var(--u) * 1.45); color: rgba(255,255,255,.85); font-weight: 600; }
+  .v #s6 .copy { padding: 0 6%; }
+</style>
+</head>
+<body>
+
+<!-- 1. Hook -->
+<section class="scene" id="s1">
+  <div class="photo"></div><div class="wash"></div>
+  <div class="copy">
+    <span class="eyebrow line" id="s1e"><i></i>For passengers</span>
+    <h1 class="big line" id="s1a">Reading in the car?</h1>
+    <div class="sub line" id="s1b">That’s usually when the queasiness starts.</div>
+  </div>
+</section>
+
+<!-- 2. Why it happens -->
+<section class="scene" id="s2">
+  <div class="copy">
+    <h2 class="big line" id="s2a">Your inner ear feels every turn.</h2>
+    <h2 class="big line" id="s2b">Your eyes see a screen that never moves.</h2>
+    <h2 class="big moss line" id="s2c">That mismatch is what makes you sick.</h2>
+  </div>
+  <div class="cards line" id="s2cards">
+    <div class="card">
+      <svg viewBox="0 0 200 150">
+        <rect width="200" height="150" fill="#e9ede3"/>
+        <path d="M150 170 C 150 110, 40 110, 60 70 S 170 30, 120 -20" fill="none" stroke="#55704a" stroke-width="26" stroke-linecap="round"/>
+        <path id="road" d="M150 170 C 150 110, 40 110, 60 70 S 170 30, 120 -20" fill="none" stroke="#f4f5f2" stroke-width="2" stroke-dasharray="7 8"/>
+        <g id="car"><rect x="-7" y="-11" width="14" height="22" rx="4" fill="#161716"/><rect x="-5" y="-6" width="10" height="6" rx="1.5" fill="#cfe0b8"/></g>
+      </svg>
+      <h4>Your inner ear</h4><p>feels the car speed up, brake and turn.</p>
+    </div>
+    <div class="card">
+      <svg viewBox="0 0 200 150">
+        <rect width="200" height="150" fill="#eceeea"/>
+        <rect x="30" y="22" width="140" height="92" rx="8" fill="#fff" stroke="#d5d8d1"/>
+        <rect x="46" y="38" width="80" height="8" rx="3" fill="#dfe2dc"/><rect x="46" y="54" width="108" height="6" rx="3" fill="#e8eae6"/>
+        <rect x="46" y="66" width="100" height="6" rx="3" fill="#e8eae6"/><rect x="46" y="78" width="108" height="6" rx="3" fill="#e8eae6"/>
+        <rect x="46" y="90" width="64" height="6" rx="3" fill="#e8eae6"/><rect x="18" y="114" width="164" height="10" rx="5" fill="#d5d8d1"/>
+      </svg>
+      <h4>Your eyes</h4><p>see a page that stays perfectly still.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3. The product -->
+<section class="scene" id="s3">
+  <div class="photo" id="s3photo"></div><div class="wash" style="opacity:.55"></div><div class="titlewash" id="s3tw"></div>
+  <div class="title line" id="s3title">
+    <div>
+      <span class="eyebrow"><i></i>Free for Windows</span>
+      <h1 class="big" style="margin-top:calc(var(--u) * 1.4)">Meet SteadyCues.</h1>
+      <div class="tag">Dots at the edge of your screen that move with the road.</div>
+    </div>
+  </div>
+  <div class="stage line" id="s3stage">
+    <div class="screen">
+      <div class="bar"><span><img src="../../website/public/icon-64.png" alt="">SteadyCues</span><span>Phone connected · 9:41 AM</span></div>
+      <article class="reader">
+        <p class="k">Chapter three</p>
+        <h3>The long way round</h3>
+        <p>We left the city before the fog had lifted, the road unspooling ahead of us like a pale ribbon laid across the hills. Somewhere past the second bridge the valley opened, and the morning came in all at once.</p>
+        <p>I had meant to read the whole way. Usually that is where the trouble starts: a few pages in, the words begin to swim and the horizon tilts. Today the page stayed still, and so did I.</p>
+        <p>Outside, sheep scattered from the verge. The driver hummed something tuneless. I turned the page.</p>
+      </article>
+      <canvas class="dots" id="dots"></canvas>
+    </div>
+    <div class="dock">
+      <div class="tile"><svg class="gauge" viewBox="-24 -24 48 48"><circle class="r" r="20"/><circle class="r r2" r="10"/><line x1="-20" x2="20"/><line y1="-20" y2="20"/><circle class="dot" id="gdot" r="4.5"/></svg>
+        <span class="chip" id="chip">Parked</span></div>
+      <div class="tile cap" id="cap">Waiting at the lights. Everything is still.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. Phone -->
+<section class="scene" id="s4">
+  <div class="copy">
+    <span class="eyebrow line" id="s4e"><i></i>Most laptops have no motion sensor</span>
+    <h2 class="big line" id="s4a">Your phone can be the sensor.</h2>
+    <div class="steps">
+      <div class="step line" id="st1"><b>1</b>Scan the code on your PC</div>
+      <div class="step line" id="st2"><b>2</b>Tap Start on your phone</div>
+      <div class="step line" id="st3"><b>3</b>Read. The dots do the rest.</div>
+    </div>
+  </div>
+  <div class="appshot line" id="appshot">
+    <img src="../../website/public/screenshot-pair.png" alt="">
+    <img src="../../website/public/screenshot-home.png" alt="" id="apphome">
+    <div class="scan" id="scan"></div>
+  </div>
+  <div class="phone line" id="phone">
+    <div class="notch"></div>
+    <iframe id="phoneframe" src="../../src/SteadyCues/Assets/phone.html" title="Phone page"></iframe>
+    <div class="tap" id="tap"></div>
+  </div>
+</section>
+
+<!-- 5. Features -->
+<section class="scene" id="s5">
+  <h2 class="big line" id="s5a">Quiet, small and private.</h2>
+  <ul>
+    <li class="line"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#e4e9da"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#4b6340" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Fades in when the car moves, out when it stops</li>
+    <li class="line"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#e4e9da"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#4b6340" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Clicks pass straight through the dots</li>
+    <li class="line"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#e4e9da"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#4b6340" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Hidden from screenshots and screen sharing</li>
+    <li class="line"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#e4e9da"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#4b6340" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>No account, no internet, no tracking</li>
+    <li class="line"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#e4e9da"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#4b6340" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>355 KB. Free and open source.</li>
+  </ul>
+</section>
+
+<!-- 6. End card -->
+<section class="scene" id="s6">
+  <div class="photo" id="s6photo" style="background-position: center 80%"></div><div class="dim"></div>
+  <div class="copy">
+    <img class="icon line" id="s6i" src="../../website/public/icon-256.png" alt="">
+    <h1 class="big line" id="s6a">SteadyCues</h1>
+    <div class="tag line" id="s6b">Free motion cues for Windows</div>
+    <div class="pill line" id="s6c">steadycues.vercel.app</div>
+    <div class="gh line" id="s6d">★ Star it on GitHub · Aweswomedude1234/motion-cues</div>
+  </div>
+</section>
+
+<script>
+(function () {
+  'use strict';
+  const params = new URLSearchParams(location.search);
+  if (params.get('format') === 'vertical') document.documentElement.classList.add('v');
+  const PHOTO = 'https://images.unsplash.com/photo-1447871622716-5dc761437456?auto=format&fit=crop&w=2400&q=82';
+  document.querySelectorAll('.photo').forEach(p => p.style.backgroundImage = `url("${PHOTO}")`);
+
+  // ------------------------------------------------------------------ timeline
+  const S = { s1: [0, 4.6], s2: [4.6, 11.2], s3: [11.2, 25.6], s4: [25.6, 33.4], s5: [33.4, 38.6], s6: [38.6, 44] };
+  window.DURATION = 44;
+  const $ = id => document.getElementById(id);
+  const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+  const easeOut = x => 1 - Math.pow(1 - clamp(x), 3);
+  const easeInOut = x => { x = clamp(x); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+  const win = (t, a, b, fi = .5, fo = .5) => Math.min(easeOut((t - a) / fi), 1 - easeInOut((t - (b - fo)) / fo));
+
+  function rise(el, t, start, dur = .7, dist = 2.2) {
+    const p = easeOut((t - start) / dur);
+    el.style.opacity = p;
+    el.style.transform = `translateY(calc(var(--u) * ${(1 - p) * dist}))`;
+  }
+
+  // ------------------------------------------------------------------ car simulation (scene 3)
+  // Scripted drive in scene-local seconds: forward accel (m/s²) and sideways accel (+ = right turn).
+  const DRIVE = [
+    { t: 3.2, lon: 0, lat: 0, chip: 'Parked', cap: 'Waiting at the lights. Everything is still.' },
+    { t: 2.6, lon: 2.7, lat: 0, chip: 'Speeding up', cap: 'You sink back into the seat, so the dots slide down.' },
+    { t: 1.4, lon: 0.2, lat: 0, chip: 'Cruising', cap: 'Steady speed. The dots settle back into place.' },
+    { t: 2.6, lon: 0, lat: -3, chip: 'Left bend', cap: 'You’re pushed to the right, and so are the dots.' },
+    { t: 2.2, lon: 0, lat: 3, chip: 'Right bend', cap: 'Now you lean left. The dots follow.' },
+    { t: 2.4, lon: -3.4, lat: 0, chip: 'Braking', cap: 'You tip forward, so the dots drift up.' },
+  ];
+  const sim = { t: 0, ox: 0, oy: 0, vx: 0, vy: 0, lon: 0, lat: 0 };
+  function segAt(t) { let a = 0; for (const s of DRIVE) { a += s.t; if (t < a) return s; } return DRIVE[DRIVE.length - 1]; }
+  function stepSim(to) {
+    const h = 1 / 240;
+    while (sim.t + h <= to) {
+      const s = segAt(sim.t), k = 1 - Math.exp(-h / 0.4);
+      sim.lon += (s.lon - sim.lon) * k; sim.lat += (s.lat - sim.lat) * k;
+      const fx = -sim.lat, fy = sim.lon, gain = .2, lim = 1.6, w = 2 * Math.PI * 1.1, z = .85;
+      const tx = lim * Math.tanh(fx * gain / lim), ty = lim * Math.tanh(fy * gain / lim);
+      sim.vx += (w * w * (tx - sim.ox) - 2 * z * w * sim.vx) * h; sim.vy += (w * w * (ty - sim.oy) - 2 * z * w * sim.vy) * h;
+      sim.ox += sim.vx * h; sim.oy += sim.vy * h; sim.t += h;
+    }
+  }
+
+  const canvas = $('dots'), ctx = canvas.getContext('2d');
+  function sizeCanvas() {
+    const r = canvas.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.round(r.width * dpr); canvas.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function smooth(e0, e1, x) { const t = clamp((x - e0) / (e1 - e0)); return t * t * (3 - 2 * t); }
+  function drawDots() {
+    const W = canvas.clientWidth, H = canvas.clientHeight;
+    ctx.clearRect(0, 0, W, H);
+    const s = Math.min(H / 7.2, W / 9), r = s * .11, depth = s * 2;
+    const px = sim.ox * s, py = sim.oy * s, wx = px - s * Math.round(px / s), wy = py - s * Math.round(py / s);
+    ctx.lineWidth = Math.max(1.5, r * .3);
+    for (const side of [0, 1]) for (let k = -1; k <= 2; k++) {
+      const fe = s * (k + .5) + (side ? -wx : wx), x = side ? W - fe : fe, a = 1 - smooth(depth - s * .75, depth, fe);
+      if (a <= .01) continue;
+      for (let j = -7; j <= 7; j++) {
+        const y = H / 2 + s * (j - .5) + wy;
+        ctx.globalAlpha = a; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(24,24,24,.86)'; ctx.fill(); ctx.strokeStyle = 'rgba(255,255,255,.95)'; ctx.stroke();
+      }
+    }
+    ctx.globalAlpha = 1;
+    $('gdot').setAttribute('transform', `translate(${(sim.ox * 9).toFixed(2)} ${(sim.oy * 9).toFixed(2)})`);
+  }
+
+  // ------------------------------------------------------------------ phone page (scene 4)
+  let phoneState = '';
+  function phone(state) {
+    if (state === phoneState) return;
+    const d = $('phoneframe').contentDocument;
+    if (!d || !d.body) return;
+    phoneState = state;
+    const walk = d.createTreeWalker(d.body, NodeFilter.SHOW_TEXT);
+    for (let n; (n = walk.nextNode());) n.nodeValue = n.nodeValue.replace(/\{\{PC_NAME\}\}/g, 'your PC').replace(/\{\{VERSION\}\}/g, '1.1');
+    d.getElementById('problem').classList.add('hidden');
+    d.querySelectorAll('img').forEach(i => { i.src = '/website/public/icon-64.png'; });
+    if (!d.getElementById('mock-pad')) { const st = d.createElement('style'); st.id = 'mock-pad'; st.textContent = 'main{padding-top:52px !important}'; d.head.appendChild(st); }
+    const running = state === 'running';
+    d.getElementById('intro').classList.toggle('hidden', running);
+    d.getElementById('running').classList.toggle('hidden', !running);
+    if (running) {
+      d.getElementById('pip').className = 'pip ok';
+      d.getElementById('statusText').textContent = 'Connected to your PC';
+      d.getElementById('meta').textContent = '60 readings per second';
+      d.getElementById('previewNote').textContent = 'Dots are showing on your PC';
+    }
+  }
+
+  // ------------------------------------------------------------------ frame
+  window.renderFrame = function (t) {
+    for (const [id, [a, b]] of Object.entries(S)) $(id).style.opacity = win(t, a, b, id === 's1' ? .01 : .6, id === 's6' ? .01 : .6);
+
+    // 1
+    if (t < S.s1[1]) {
+      document.querySelector('#s1 .photo').style.transform = `scale(${1.1 - .08 * easeOut(t / 4.6)})`;
+      rise($('s1e'), t, .2); rise($('s1a'), t, .45, .9, 3); rise($('s1b'), t, 1.9);
+    }
+    // 2
+    if (t >= S.s2[0] - .1 && t < S.s2[1]) {
+      const l = t - S.s2[0];
+      rise($('s2a'), t, S.s2[0] + .3); rise($('s2b'), t, S.s2[0] + 1.7); rise($('s2c'), t, S.s2[0] + 3.2);
+      rise($('s2cards'), t, S.s2[0] + .5, .9, 3);
+      const road = $('road'), len = road.getTotalLength(), p = road.getPointAtLength(len * ((l * .16) % 1));
+      const q = road.getPointAtLength(Math.min(len, len * ((l * .16) % 1) + 2));
+      $('car').setAttribute('transform', `translate(${p.x} ${p.y}) rotate(${Math.atan2(q.y - p.y, q.x - p.x) * 180 / Math.PI + 90})`);
+    }
+    // 3
+    if (t >= S.s3[0] - .1 && t < S.s3[1]) {
+      const l = t - S.s3[0];
+      $('s3photo').style.transform = `scale(${1.08 - .06 * easeOut(l / 14)})`;
+      $('s3title').style.opacity = win(l, .1, 2.6, .6, .5);
+      $('s3tw').style.opacity = win(l, 0, 2.9, .01, .6);
+      $('s3title').style.transform = `translateY(calc(var(--u) * ${(1 - easeOut((l - .1) / .8)) * 2}))`;
+      const st = $('s3stage'), p = easeOut((l - 2.6) / .9);
+      st.style.opacity = p; st.style.transform = `translateY(calc(var(--u) * ${(1 - p) * 4})) scale(${.97 + .03 * p})`;
+      if (!canvas.width) sizeCanvas();
+      const drive = Math.max(0, l - 3.2);
+      stepSim(drive);
+      const seg = segAt(drive);
+      if ($('chip').textContent !== seg.chip) { $('chip').textContent = seg.chip; $('cap').textContent = seg.cap; }
+      drawDots();
+    }
+    // 4
+    if (t >= S.s4[0] - .1 && t < S.s4[1]) {
+      const l = t - S.s4[0];
+      rise($('s4e'), t, S.s4[0] + .2); rise($('s4a'), t, S.s4[0] + .4, .8, 3);
+      rise($('st1'), t, S.s4[0] + 1.4); rise($('st2'), t, S.s4[0] + 3.2); rise($('st3'), t, S.s4[0] + 5);
+      rise($('appshot'), t, S.s4[0] + .6, .9, 3); rise($('phone'), t, S.s4[0] + .9, .9, 4);
+      phone(l < 3.6 ? 'intro' : 'running');
+      const scan = $('scan'), sp = clamp((l - 1.6) / 1.2);
+      scan.style.opacity = l > 1.6 && l < 2.9 ? 1 : 0; scan.style.top = `${38 + sp * 34}%`;
+      $('apphome').style.opacity = easeOut((l - 4.2) / .6);
+      document.querySelector('#appshot img').style.opacity = 1 - easeOut((l - 4.2) / .6);
+      const tap = $('tap'), tp = clamp((l - 3.1) / .5);
+      tap.style.left = '50%'; tap.style.top = '67%';
+      tap.style.opacity = l > 3.1 && l < 3.6 ? 1 - tp : 0; tap.style.transform = `translate(-50%,-50%) scale(${.4 + tp * .9})`;
+    }
+    // 5
+    if (t >= S.s5[0] - .1 && t < S.s5[1]) {
+      rise($('s5a'), t, S.s5[0] + .2, .8, 3);
+      document.querySelectorAll('#s5 li').forEach((li, i) => rise(li, t, S.s5[0] + .8 + i * .55));
+    }
+    // 6
+    if (t >= S.s6[0] - .1) {
+      const l = t - S.s6[0];
+      $('s6photo').style.transform = `scale(${1.06 - .05 * easeOut(l / 5)})`;
+      rise($('s6i'), t, S.s6[0] + .2, .8, 2); rise($('s6a'), t, S.s6[0] + .45, .8, 3);
+      rise($('s6b'), t, S.s6[0] + .8); rise($('s6c'), t, S.s6[0] + 1.3); rise($('s6d'), t, S.s6[0] + 1.8);
+    }
+  };
+
+  // Resolves once fonts, images and the phone page are loaded.
+  window.ready = Promise.all([
+    document.fonts.ready,
+    new Promise(r => { const i = new Image(); i.onload = i.onerror = r; i.src = PHOTO; }),
+    new Promise(r => { const f = $('phoneframe'); if (f.contentDocument && f.contentDocument.readyState === 'complete') r(); else f.onload = r; }),
+    ...[...document.images].map(img => img.complete ? 0 : new Promise(r => { img.onload = img.onerror = r; })),
+  ]).then(() => { sizeCanvas(); return true; });
+
+  // Real-time preview in a normal browser: composition.html?play
+  if (params.has('play')) window.ready.then(() => {
+    const t0 = performance.now();
+    (function loop() { const t = (performance.now() - t0) / 1000 % window.DURATION; if (t < .05) Object.assign(sim, { t: 0, ox: 0, oy: 0, vx: 0, vy: 0, lon: 0, lat: 0 }); renderFrame(t); requestAnimationFrame(loop); })();
+  });
+})();
+</script>
+</body>
+</html>

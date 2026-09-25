@@ -40,18 +40,34 @@ namespace SteadyCues
             Application.ThreadException += (s, e) => Crash(e.Exception);
             AppDomain.CurrentDomain.UnhandledException += (s, e) => Crash(e.ExceptionObject as Exception);
 
+            bool quiet = has("--quiet");
             if (has("--uninstall"))
             {
-                var answer = MessageBox.Show("Remove SteadyCues and its settings from this PC?", "Uninstall SteadyCues",
-                    MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
-                if (answer != DialogResult.OK) return 1;
+                if (!quiet)
+                {
+                    var answer = MessageBox.Show("Remove SteadyCues and its settings from this PC?", "Uninstall SteadyCues",
+                        MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+                    if (answer != DialogResult.OK) return 1;
+                }
                 StopRunningInstance();
                 Installer.Uninstall();
-                MessageBox.Show("SteadyCues has been removed.", "SteadyCues", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (!quiet) MessageBox.Show("SteadyCues has been removed.", "SteadyCues", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return 0;
             }
 
-            bool portable = has("--portable") || File.Exists(Path.Combine(Path.GetDirectoryName(Installer.CurrentExe), "portable.txt"));
+            if (has("--install"))
+            {
+                // Silent install for package managers (winget): copy into place, register, exit.
+                StopRunningInstance();
+                if (!Installer.Install()) return 1;
+                if (!Installer.AutoStartEnabled) Installer.SetAutoStart(true);
+                return 0;
+            }
+
+            // Package managers that keep their own copy (Scoop, winget portable) manage updates themselves.
+            bool managed = Installer.CurrentExe.IndexOf(@"\scoop\apps\", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                           Installer.CurrentExe.IndexOf(@"\WinGet\Packages\", StringComparison.OrdinalIgnoreCase) >= 0;
+            bool portable = managed || has("--portable") || File.Exists(Path.Combine(Path.GetDirectoryName(Installer.CurrentExe), "portable.txt"));
             if (!portable && !Installer.IsInstalledCopy)
             {
                 // Downloaded copy: replace any running/older install, then run from the install folder.
