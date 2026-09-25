@@ -60,4 +60,5 @@ prints any component's documentation.
 
 Update `VERSION` and `CHANGELOG.md`, then push a tag such as `v1.0.1`. The release workflow
 builds the exe, runs the tests and publishes a GitHub release with the exe and its SHA-256
-checksum.
+checksum. Then run `.\tools\update-packaging.ps1` and commit the refreshed Scoop and winget
+manifests under `packaging/`.

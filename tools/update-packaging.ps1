@@ -11,30 +11,38 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot
 $version = (Get-Content (Join-Path $root 'VERSION') -Raw).Trim()
 $url = "https://github.com/$Repo/releases/download/v$version/SteadyCues.exe"
-$hash = ((Invoke-WebRequest -UseBasicParsing "$url.sha256").Content -split '\s+')[0].Trim().ToLower()
+$hash = ((gh release download "v$version" -R $Repo -p 'SteadyCues.exe.sha256' -O - | Out-String) -split '\s+')[0].Trim().ToLower()
 if ($hash -notmatch '^[0-9a-f]{64}$') { throw "Could not read the published checksum for v$version" }
 $date = (gh release view "v$version" -R $Repo --json publishedAt --jq .publishedAt).Substring(0, 10)
 $utf8 = New-Object System.Text.UTF8Encoding $false
 
 # ---------------------------------------------------------------- Scoop
-$scoop = [ordered]@{
-    version     = $version
-    description = 'Vehicle motion cues for Windows: moving dots at the screen edges help prevent car sickness.'
-    homepage    = 'https://steadycues.vercel.app'
-    license     = 'MIT'
-    url         = $url
-    hash        = $hash
-    bin         = 'SteadyCues.exe'
-    shortcuts   = @(, @('SteadyCues.exe', 'SteadyCues'))
-    checkver    = 'github'
-    autoupdate  = [ordered]@{
-        url  = "https://github.com/$Repo/releases/download/v`$version/SteadyCues.exe"
-        hash = @{ url = '$url.sha256' }
-    }
-}
 $scoopDir = Join-Path $root 'packaging\scoop'
 New-Item -ItemType Directory -Force $scoopDir | Out-Null
-[IO.File]::WriteAllText((Join-Path $scoopDir 'steadycues.json'), ($scoop | ConvertTo-Json -Depth 5) + "`n", $utf8)
+[IO.File]::WriteAllText((Join-Path $scoopDir 'steadycues.json'), @"
+{
+    "version": "$version",
+    "description": "Vehicle motion cues for Windows: moving dots at the screen edges help prevent car sickness.",
+    "homepage": "https://steadycues.vercel.app",
+    "license": "MIT",
+    "url": "$url",
+    "hash": "$hash",
+    "bin": "SteadyCues.exe",
+    "shortcuts": [
+        [
+            "SteadyCues.exe",
+            "SteadyCues"
+        ]
+    ],
+    "checkver": "github",
+    "autoupdate": {
+        "url": "https://github.com/$Repo/releases/download/v`$version/SteadyCues.exe",
+        "hash": {
+            "url": "`$url.sha256"
+        }
+    }
+}
+"@ + "`n", $utf8)
 
 # ---------------------------------------------------------------- winget (manifest schema 1.6)
 $id = 'Aweswomedude1234.SteadyCues'

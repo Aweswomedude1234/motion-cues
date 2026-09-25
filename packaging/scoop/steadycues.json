@@ -1,0 +1,22 @@
+{
+    "version": "1.1.1",
+    "description": "Vehicle motion cues for Windows: moving dots at the screen edges help prevent car sickness.",
+    "homepage": "https://steadycues.vercel.app",
+    "license": "MIT",
+    "url": "https://github.com/Aweswomedude1234/motion-cues/releases/download/v1.1.1/SteadyCues.exe",
+    "hash": "6ff2bbb9adc73bc175d8cecdaf00816f852e29b4bff5189c755865c010689c94",
+    "bin": "SteadyCues.exe",
+    "shortcuts": [
+        [
+            "SteadyCues.exe",
+            "SteadyCues"
+        ]
+    ],
+    "checkver": "github",
+    "autoupdate": {
+        "url": "https://github.com/Aweswomedude1234/motion-cues/releases/download/v$version/SteadyCues.exe",
+        "hash": {
+            "url": "$url.sha256"
+        }
+    }
+}
