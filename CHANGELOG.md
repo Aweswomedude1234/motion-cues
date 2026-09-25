@@ -4,6 +4,15 @@ All notable changes to SteadyCues are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [1.1.0] - 2026-09-25
+
+### Changed
+- New app icon: a road winding toward a low sun, framed by the cue dots.
+- Calmer, natural look: neutral graphite (dark) and white (light) backgrounds with a moss and sage
+  accent, replacing the navy and neon cyan. The phone page matches.
+- Redesigned website with a photographic hero and a live, glass-screen demo of the cues.
+- The website now lives at https://steadycues.vercel.app/.
+
 ## [1.0.0] - 2026-09-25
 
 ### Added

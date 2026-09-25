@@ -31,15 +31,17 @@ namespace SteadyCues.UI
 
             if (Dark)
             {
-                Bg = Hex(0x0B1220); Surface = Hex(0x121A2B); Subtle = Hex(0x1A2438); Border = Hex(0x253047);
-                Text = Hex(0xEEF1F6); Muted = Hex(0x9AA4B6); Accent = Hex(0x22D3EE); AccentText = Hex(0x06202A);
-                AccentSoft = Hex(0x0F2A36); Ok = Hex(0x4ADE80); Warn = Hex(0xFBBF24); Error = Hex(0xF87171); Focus = Hex(0x67E8F9);
+                // Neutral graphite (Windows 11 dark) with a sage accent.
+                Bg = Hex(0x202020); Surface = Hex(0x2B2B2B); Subtle = Hex(0x333333); Border = Hex(0x3D3D3D);
+                Text = Hex(0xF3F3F3); Muted = Hex(0xA3A3A3); Accent = Hex(0xA9BD93); AccentText = Hex(0x1C1C1C);
+                AccentSoft = Hex(0x2F3629); Ok = Hex(0x9CC08A); Warn = Hex(0xE0B15C); Error = Hex(0xE0826B); Focus = Hex(0xC8D8B4);
             }
             else
             {
-                Bg = Hex(0xF6F7F9); Surface = Hex(0xFFFFFF); Subtle = Hex(0xEEF0F4); Border = Hex(0xE3E6EC);
-                Text = Hex(0x0B1220); Muted = Hex(0x5B6475); Accent = Hex(0x0E7490); AccentText = Color.White;
-                AccentSoft = Hex(0xE0F2F7); Ok = Hex(0x15803D); Warn = Hex(0xB45309); Error = Hex(0xB91C1C); Focus = Hex(0x155E75);
+                // Neutral light (Windows 11) with a moss accent.
+                Bg = Hex(0xF3F3F3); Surface = Hex(0xFFFFFF); Subtle = Hex(0xEBEBEB); Border = Hex(0xE0E0E0);
+                Text = Hex(0x1B1B1B); Muted = Hex(0x5F5F5F); Accent = Hex(0x4A6340); AccentText = Hex(0xFFFFFF);
+                AccentSoft = Hex(0xE4E9DA); Ok = Hex(0x4A6B3A); Warn = Hex(0x9A6414); Error = Hex(0xA8412B); Focus = Hex(0x3E5636);
             }
         }
 

@@ -1,58 +1,35 @@
 import type {ComponentType, ReactNode, SVGProps} from 'react';
-import {AppShell} from '@astryxdesign/core/AppShell';
-import {TopNav, TopNavHeading, TopNavItem} from '@astryxdesign/core/TopNav';
-import {NavIcon} from '@astryxdesign/core/NavIcon';
 import {Section} from '@astryxdesign/core/Section';
-import {Stack, VStack, HStack} from '@astryxdesign/core/Stack';
+import {VStack, HStack} from '@astryxdesign/core/Stack';
 import {Grid} from '@astryxdesign/core/Grid';
 import {Card} from '@astryxdesign/core/Card';
 import {Heading, Text} from '@astryxdesign/core/Text';
 import {Button} from '@astryxdesign/core/Button';
-import {Badge} from '@astryxdesign/core/Badge';
 import {Icon} from '@astryxdesign/core/Icon';
 import {Code} from '@astryxdesign/core/Code';
 import {Link} from '@astryxdesign/core/Link';
 import {List, ListItem} from '@astryxdesign/core/List';
 import {Collapsible, CollapsibleGroup} from '@astryxdesign/core/Collapsible';
-import {Divider} from '@astryxdesign/core/Divider';
+import {MediaTheme} from '@astryxdesign/core/theme';
 import {
-  Download, EyeOff, Feather, Gauge, Keyboard, Monitor, MousePointerClick, Move, ShieldCheck,
-  SlidersHorizontal, Smartphone, Sparkles,
+  ArrowDownToLine, ArrowUpRight, EyeOff, Feather, Gauge, Keyboard, Monitor, MousePointerClick, Move,
+  ShieldCheck, SlidersHorizontal, Smartphone, Sparkles,
 } from 'lucide-react';
-import {MotionDemo} from './components/MotionDemo';
-import {DOWNLOAD_URL, ISSUES_URL, LICENSE_URL, RELEASES_URL, REPO_URL, VERSION} from './site';
+import {CueShowcase} from './components/CueShowcase';
+import {
+  DOWNLOAD_URL, ISSUES_URL, LICENSE_URL, PHOTO_CREDIT, PHOTO_PAGE, RELEASES_URL, REPO_URL, VERSION, photo,
+} from './site';
 
 type IconType = ComponentType<SVGProps<SVGSVGElement>>;
-
-function GitHubMark(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" {...props}>
-      <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
-    </svg>
-  );
-}
 
 function Logo({size = 24}: {size?: number}) {
   return <img src="./icon-64.png" width={size} height={size} alt="" className="logo" />;
 }
 
-function Page({id, children, label}: {id?: string; children: ReactNode; label?: string}) {
+function DownloadButton({size = 'lg'}: {size?: 'sm' | 'md' | 'lg'}) {
   return (
-    <Section variant="transparent" paddingBlock={10} paddingInline={0}>
-      <section id={id} aria-label={label} className="page">
-        {children}
-      </section>
-    </Section>
-  );
-}
-
-function SectionIntro({eyebrow, title, children}: {eyebrow: string; title: string; children?: ReactNode}) {
-  return (
-    <VStack gap={3} maxWidth={720}>
-      <Text type="label" color="accent">{eyebrow}</Text>
-      <Heading level={2} type="display-3" textWrap="balance">{title}</Heading>
-      {children ? <Text type="large" color="secondary" textWrap="pretty">{children}</Text> : null}
-    </VStack>
+    <Button label={size === 'sm' ? 'Download' : 'Download for Windows'} variant="primary" size={size} href={DOWNLOAD_URL}
+      icon={<Icon icon={ArrowDownToLine} size="sm" color="inherit" />} />
   );
 }
 
@@ -61,9 +38,27 @@ function Desc({children}: {children: ReactNode}) {
   return <Text type="supporting" color="secondary" textWrap="pretty">{children}</Text>;
 }
 
+function Band({id, label, muted, children}: {id?: string; label: string; muted?: boolean; children: ReactNode}) {
+  return (
+    <Section variant={muted ? 'muted' : 'transparent'} paddingBlock={0} paddingInline={0}>
+      <section id={id} aria-label={label} className="page band">{children}</section>
+    </Section>
+  );
+}
+
+function SectionIntro({eyebrow, title, children}: {eyebrow: string; title: string; children?: ReactNode}) {
+  return (
+    <VStack gap={4} maxWidth={760}>
+      <Text type="label" color="accent">{eyebrow}</Text>
+      <Heading level={2} textWrap="balance" className="section-title">{title}</Heading>
+      {children ? <Text type="large" color="secondary" textWrap="pretty">{children}</Text> : null}
+    </VStack>
+  );
+}
+
 function FeatureCard({icon, title, children}: {icon: IconType; title: string; children: ReactNode}) {
   return (
-    <Card height="100%">
+    <Card height="100%" padding={6}>
       <VStack gap={3}>
         <span className="feature-icon"><Icon icon={icon} size="md" color="accent" /></span>
         <Heading level={3}>{title}</Heading>
@@ -73,7 +68,7 @@ function FeatureCard({icon, title, children}: {icon: IconType; title: string; ch
   );
 }
 
-const FAQ: Array<{q: string; a: ReactNode}> = [
+const FAQ: Array<{q: string; a: string}> = [
   {
     q: 'Will this stop me getting car sick?',
     a: 'It helps many people, but not everyone, and it isn’t a medical treatment. Motion cues are designed to reduce the mismatch between what your eyes see and what your inner ear feels, which is widely thought to cause motion sickness. Taking breaks and looking out of the window still help too.',
@@ -108,74 +103,71 @@ const FAQ: Array<{q: string; a: ReactNode}> = [
   },
 ];
 
+function Nav() {
+  return (
+    <nav className="nav" aria-label="Main navigation">
+      <a className="nav-brand" href="#top">
+        <Logo size={24} />
+        <span>SteadyCues</span>
+      </a>
+      <div className="nav-links">
+        <Link href="#how" color="primary" size="sm">How it works</Link>
+        <Link href="#setup" color="primary" size="sm">Setup</Link>
+        <Link href="#features" color="primary" size="sm">Features</Link>
+        <Link href="#faq" color="primary" size="sm">FAQ</Link>
+        <Link href={REPO_URL} color="primary" size="sm">GitHub</Link>
+      </div>
+      <DownloadButton size="sm" />
+    </nav>
+  );
+}
+
+function Hero() {
+  return (
+    <header className="hero" id="top">
+      <img
+        className="hero-photo"
+        src={photo(1920)}
+        srcSet={`${photo(1280)} 1280w, ${photo(1920)} 1920w, ${photo(2560)} 2560w`}
+        sizes="100vw"
+        alt=""
+        fetchPriority="high"
+      />
+      <div className="hero-wash" aria-hidden="true" />
+      <Nav />
+      <MediaTheme mode="light">
+        <div className="hero-copy">
+          <span className="hero-eyebrow"><span className="eyebrow-dot" aria-hidden="true" />For passengers on Windows</span>
+          <h1 className="hero-title">Read in the car without feeling sick.</h1>
+          <p className="hero-lede">
+            SteadyCues puts softly moving dots at the edges of your screen. They follow the road, so what you
+            see finally agrees with what you feel.
+          </p>
+          <HStack gap={4} vAlign="center" hAlign="center" wrap="wrap">
+            <DownloadButton />
+            <Link href={REPO_URL} color="primary" weight="semibold">
+              <span className="hero-link">View source <Icon icon={ArrowUpRight} size="sm" color="inherit" /></span>
+            </Link>
+          </HStack>
+          <p className="hero-facts">
+            <span>Free and open source</span><span>355 KB</span><span>No admin rights</span><span>Works with any phone</span>
+          </p>
+        </div>
+      </MediaTheme>
+      <CueShowcase />
+    </header>
+  );
+}
+
 export function App() {
   return (
-    <AppShell
-      height="auto"
-      variant="surface"
-      topNav={
-        <TopNav
-          label="Main navigation"
-          heading={<TopNavHeading heading="SteadyCues" headingHref="#top" logo={<NavIcon icon={<Logo size={20} />} />} />}
-          startContent={
-            <>
-              <TopNavItem label="How it works" href="#how" />
-              <TopNavItem label="Setup" href="#setup" />
-              <TopNavItem label="Features" href="#features" />
-              <TopNavItem label="FAQ" href="#faq" />
-            </>
-          }
-          endContent={
-            <HStack gap={2}>
-              <Button label="GitHub" variant="ghost" size="sm" href={REPO_URL} icon={<GitHubMark width={16} height={16} />} isIconOnly tooltip="Source code on GitHub" />
-              <Button label="Download" variant="primary" size="sm" href={DOWNLOAD_URL} />
-            </HStack>
-          }
-        />
-      }>
-      <main id="top">
-        {/* Hero */}
-        <Section variant="transparent" paddingBlock={10} paddingInline={0}>
-          <div className="page">
-            <VStack gap={10}>
-              <VStack gap={6} hAlign="center">
-                <Badge variant="cyan" label="Free and open source · Windows 10 and 11" />
-                <Heading level={1} type="display-1" justify="center" textWrap="balance">
-                  Read in the car without feeling sick
-                </Heading>
-                <VStack maxWidth={660}>
-                  <Text type="large" color="secondary" justify="center" textWrap="pretty">
-                    SteadyCues puts softly moving dots at the edges of your screen. They move with the car, so what
-                    you see finally agrees with what you feel.
-                  </Text>
-                </VStack>
-                <HStack gap={3} wrap="wrap" hAlign="center">
-                  <Button label="Download for Windows" variant="primary" size="lg" href={DOWNLOAD_URL}
-                    icon={<Icon icon={Download} size="sm" color="inherit" />} />
-                  <Button label="View source on GitHub" variant="secondary" size="lg" href={REPO_URL}
-                    icon={<GitHubMark width={16} height={16} />} />
-                </HStack>
-                <Text type="supporting" color="secondary" justify="center">
-                  Version {VERSION} · 360 KB · Installs in seconds, no admin rights needed
-                </Text>
-              </VStack>
-              <VStack maxWidth={880} width="100%">
-                <div className="hero-demo">
-                  <Card padding={3} elevation="low">
-                    <MotionDemo />
-                  </Card>
-                </div>
-              </VStack>
-            </VStack>
-          </div>
-        </Section>
-
-        <Divider />
-
+    <>
+      <Hero />
+      <main>
         {/* How it works */}
-        <Page id="how" label="How it works">
-          <VStack gap={8}>
-            <SectionIntro eyebrow="How it works" title="What you see, matched to what you feel">
+        <Band id="how" label="How it works">
+          <VStack gap={10}>
+            <SectionIntro eyebrow="How it works" title="What you see, matched to what you feel.">
               On the road your inner ear feels every start, stop and bend, but your eyes, fixed on a still screen,
               see nothing move. SteadyCues shows that motion at the edge of your view, where you notice it without
               looking at it.
@@ -195,66 +187,56 @@ export function App() {
               </FeatureCard>
             </Grid>
           </VStack>
-        </Page>
+        </Band>
 
         {/* Setup */}
-        <Section variant="muted" paddingBlock={0} paddingInline={0}>
-          <Page id="setup" label="Setup">
-            <VStack gap={8}>
-              <SectionIntro eyebrow="Setup" title="Ready in about a minute">
-                No installer wizard, no account and no admin rights.
-              </SectionIntro>
-              <Grid columns={{minWidth: 320, repeat: 'fit'}} gap={8} align="start">
-                <Card>
-                  <List listStyle="decimal">
-                    <ListItem
-                      label="Download and open SteadyCues.exe"
-                      description={<Desc>It installs itself for your account and adds itself to the Start menu. If Windows warns about an unknown publisher, choose More info, then Run anyway.</Desc>}
-                    />
-                    <ListItem
-                      label="Got a tablet or 2-in-1? You’re done"
-                      description={<Desc>SteadyCues finds your PC’s motion sensor automatically.</Desc>}
-                    />
-                    <ListItem
-                      label="Otherwise, scan the code with your phone"
-                      description={<Desc>Connect both to the same Wi-Fi or your phone’s hotspot, scan the QR code on your PC, confirm the one-time notice and tap Start.</Desc>}
-                    />
-                    <ListItem
-                      label="Ride"
-                      description={<Desc>Dots appear as soon as the car moves and fade away after it stops.</Desc>}
-                    />
-                  </List>
+        <Band id="setup" label="Setup" muted>
+          <VStack gap={10}>
+            <SectionIntro eyebrow="Setup" title="Ready before you reach the highway.">
+              No installer wizard, no account and no admin rights.
+            </SectionIntro>
+            <Grid columns={{minWidth: 320, repeat: 'fit'}} gap={6} align="start">
+              <Card padding={6}>
+                <List listStyle="decimal">
+                  <ListItem label="Download and open SteadyCues.exe"
+                    description={<Desc>It installs itself for your account and adds itself to the Start menu. If Windows warns about an unknown publisher, choose More info, then Run anyway.</Desc>} />
+                  <ListItem label="Got a tablet or 2-in-1? You’re done"
+                    description={<Desc>SteadyCues finds your PC’s motion sensor automatically.</Desc>} />
+                  <ListItem label="Otherwise, scan the code with your phone"
+                    description={<Desc>Connect both to the same Wi-Fi or your phone’s hotspot, scan the QR code on your PC, confirm the one-time notice and tap Start.</Desc>} />
+                  <ListItem label="Ride"
+                    description={<Desc>Dots appear as soon as the car moves and fade away after it stops.</Desc>} />
+                </List>
+              </Card>
+              <VStack gap={4}>
+                <Card variant="muted" padding={6}>
+                  <VStack gap={3}>
+                    <Heading level={3}>What you need</Heading>
+                    <Text type="body" color="secondary">A Windows 10 or 11 PC, plus one of these to sense the car:</Text>
+                    <List listStyle="disc">
+                      <ListItem label="A motion sensor in your PC" description={<Desc>Most tablets and 2-in-1 laptops have one.</Desc>} />
+                      <ListItem label="Any phone with a web browser" description={<Desc>iPhone or Android. Nothing to install.</Desc>} />
+                      <ListItem label="A GPS receiver" description={<Desc>Built in or USB. Updates once a second, so cues are gentler.</Desc>} />
+                    </List>
+                  </VStack>
                 </Card>
-                <VStack gap={4}>
-                  <Card variant="muted">
-                    <VStack gap={3}>
-                      <Heading level={3}>What you need</Heading>
-                      <Text type="body" color="secondary">A Windows 10 or 11 PC, plus one of these to sense the car:</Text>
-                      <List listStyle="disc">
-                        <ListItem label="A motion sensor in your PC" description={<Desc>Most tablets and 2-in-1 laptops have one.</Desc>} />
-                        <ListItem label="Any phone with a web browser" description={<Desc>iPhone or Android. Nothing to install.</Desc>} />
-                        <ListItem label="A GPS receiver" description={<Desc>Built in or USB. Updates once a second, so cues are gentler.</Desc>} />
-                      </List>
-                    </VStack>
-                  </Card>
-                  <Card variant="muted">
-                    <HStack gap={3} vAlign="center" wrap="wrap">
-                      <Icon icon={Keyboard} size="md" color="secondary" />
-                      <Text type="body" color="secondary">
-                        Press <Code>Ctrl + Alt + M</Code> anywhere to turn the dots on or off.
-                      </Text>
-                    </HStack>
-                  </Card>
-                </VStack>
-              </Grid>
-            </VStack>
-          </Page>
-        </Section>
+                <Card variant="muted" padding={6}>
+                  <HStack gap={3} vAlign="center" wrap="wrap">
+                    <Icon icon={Keyboard} size="md" color="secondary" />
+                    <Text type="body" color="secondary">
+                      Press <Code>Ctrl + Alt + M</Code> anywhere to turn the dots on or off.
+                    </Text>
+                  </HStack>
+                </Card>
+              </VStack>
+            </Grid>
+          </VStack>
+        </Band>
 
         {/* Screenshots */}
-        <Page label="The app">
-          <VStack gap={8}>
-            <SectionIntro eyebrow="The app" title="A small app that lives in your tray">
+        <Band label="The app">
+          <VStack gap={10}>
+            <SectionIntro eyebrow="The app" title="A small app that lives in your tray.">
               One window shows whether the car is moving, connects your phone and tunes the dots. It follows Windows’
               light or dark mode.
             </SectionIntro>
@@ -273,14 +255,12 @@ export function App() {
               </figure>
             </Grid>
           </VStack>
-        </Page>
-
-        <Divider />
+        </Band>
 
         {/* Features */}
-        <Page id="features" label="Features">
-          <VStack gap={8}>
-            <SectionIntro eyebrow="Features" title="Small, quiet and private" />
+        <Band id="features" label="Features" muted>
+          <VStack gap={10}>
+            <SectionIntro eyebrow="Features" title="Small, quiet and private." />
             <Grid columns={{minWidth: 240, repeat: 'fit'}} gap={4}>
               <FeatureCard icon={Sparkles} title="Automatic mode">
                 Dots appear only when the car is moving, then fade out a little while after it stops.
@@ -296,7 +276,7 @@ export function App() {
                 No account, no analytics, no internet needed. Motion data never leaves your network.
               </FeatureCard>
               <FeatureCard icon={Feather} title="Light on your battery">
-                A 360 KB native app. It redraws only while the dots are moving and sleeps when you’re parked.
+                A 355 KB native app. It redraws only while the dots are moving and sleeps when you’re parked.
               </FeatureCard>
               <FeatureCard icon={EyeOff} title="Hidden from screen sharing">
                 The dots don’t show up in screenshots, recordings or video calls unless you want them to.
@@ -309,66 +289,66 @@ export function App() {
               </FeatureCard>
             </Grid>
           </VStack>
-        </Page>
+        </Band>
 
         {/* FAQ */}
-        <Section variant="muted" paddingBlock={0} paddingInline={0}>
-          <Page id="faq" label="Questions">
-            <Grid columns={{minWidth: 300, repeat: 'fit'}} gap={8} align="start">
-              <SectionIntro eyebrow="FAQ" title="Questions, answered">
-                Something else? Ask on GitHub.
-              </SectionIntro>
-              <CollapsibleGroup type="single" hasDividers defaultValue={FAQ[0].q}>
-                {FAQ.map(item => (
-                  <Collapsible key={item.q} value={item.q} trigger={<Text type="body" weight="semibold">{item.q}</Text>}>
-                    <Text type="body" color="secondary">{item.a}</Text>
-                  </Collapsible>
-                ))}
-              </CollapsibleGroup>
-            </Grid>
-          </Page>
-        </Section>
+        <Band id="faq" label="Questions">
+          <Grid columns={{minWidth: 300, repeat: 'fit'}} gap={10} align="start">
+            <SectionIntro eyebrow="FAQ" title="Questions, answered.">
+              Something else? <Link href={ISSUES_URL}>Ask on GitHub</Link>.
+            </SectionIntro>
+            <CollapsibleGroup type="single" hasDividers defaultValue={FAQ[0].q}>
+              {FAQ.map(item => (
+                <Collapsible key={item.q} value={item.q} trigger={<Text type="body" weight="semibold">{item.q}</Text>}>
+                  <Text type="body" color="secondary">{item.a}</Text>
+                </Collapsible>
+              ))}
+            </CollapsibleGroup>
+          </Grid>
+        </Band>
 
-        {/* Closing call to action */}
-        <Page label="Download">
-          <Card padding={8}>
-            <Stack direction="vertical" gap={5} hAlign="center">
-              <Logo size={56} />
-              <Heading level={2} type="display-3" justify="center" textWrap="balance">
-                Make your next trip a little easier
-              </Heading>
-              <Text type="body" color="secondary" justify="center">
-                Free forever. MIT licensed. Built in the open.
-              </Text>
-              <HStack gap={3} wrap="wrap" hAlign="center">
-                <Button label="Download for Windows" variant="primary" size="lg" href={DOWNLOAD_URL}
-                  icon={<Icon icon={Download} size="sm" color="inherit" />} />
-                <Button label="All releases" variant="secondary" size="lg" href={RELEASES_URL} />
-              </HStack>
-            </Stack>
-          </Card>
-        </Page>
+        {/* Closing call to action, back out on the road */}
+        <section className="page closing-wrap" aria-label="Download">
+          <div className="closing">
+            <img className="closing-photo" src={photo(1600)} alt="" loading="lazy" />
+            <MediaTheme mode="dark">
+              <div className="closing-copy">
+                <h2 className="closing-title">Make the next trip a little easier.</h2>
+                <Text type="large" color="secondary">Free forever. MIT licensed. Built in the open.</Text>
+                <HStack gap={3} wrap="wrap" hAlign="center">
+                  <DownloadButton />
+                  <Button label="All releases" variant="secondary" size="lg" href={RELEASES_URL} />
+                </HStack>
+              </div>
+            </MediaTheme>
+          </div>
+        </section>
       </main>
 
-      <Divider />
       <footer className="page footer">
-        <VStack gap={4}>
-          <HStack gap={2} vAlign="center">
-            <Logo size={20} />
-            <Text type="label">SteadyCues</Text>
+        <HStack gap={6} wrap="wrap" hAlign="between" vAlign="start">
+          <VStack gap={3} maxWidth={520}>
+            <HStack gap={2} vAlign="center">
+              <Logo size={22} />
+              <Text type="label">SteadyCues {VERSION}</Text>
+            </HStack>
+            <Text type="supporting" color="secondary" textWrap="pretty">
+              Free and open-source software under the MIT license. Inspired by Vehicle Motion Cues on iPhone; not
+              affiliated with Apple or Microsoft. For passengers only.
+            </Text>
+            <Text type="supporting" color="secondary">
+              Photograph by <Link href={PHOTO_CREDIT.url} size="sm">{PHOTO_CREDIT.name}</Link> on{' '}
+              <Link href={PHOTO_PAGE} size="sm">Unsplash</Link>.
+            </Text>
+          </VStack>
+          <HStack gap={5} wrap="wrap">
+            <Link href={REPO_URL} size="sm" color="primary">Source code</Link>
+            <Link href={RELEASES_URL} size="sm" color="primary">Releases</Link>
+            <Link href={ISSUES_URL} size="sm" color="primary">Report a problem</Link>
+            <Link href={LICENSE_URL} size="sm" color="primary">License</Link>
           </HStack>
-          <Text type="supporting" color="secondary" textWrap="pretty">
-            Free and open-source software under the MIT license. Inspired by Vehicle Motion Cues on iPhone; not
-            affiliated with Apple or Microsoft. For passengers only.
-          </Text>
-          <HStack gap={4} wrap="wrap">
-            <Link href={REPO_URL} size="sm">Source code</Link>
-            <Link href={RELEASES_URL} size="sm">Releases</Link>
-            <Link href={ISSUES_URL} size="sm">Report a problem</Link>
-            <Link href={LICENSE_URL} size="sm">License</Link>
-          </HStack>
-        </VStack>
+        </HStack>
       </footer>
-    </AppShell>
+    </>
   );
 }

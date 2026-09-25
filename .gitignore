@@ -12,3 +12,6 @@ website/dist/
 *.user
 Thumbs.db
 .DS_Store
+
+# Local tool settings
+.claude/

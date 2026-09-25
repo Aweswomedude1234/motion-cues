@@ -6,4 +6,6 @@ export default defineConfig({
   base: './',
   plugins: [react()],
   build: {outDir: 'dist', sourcemap: false},
+  // Inline (empty) PostCSS config: stops Vite from picking up a postcss.config.js from a parent folder.
+  css: {postcss: {plugins: []}},
 });

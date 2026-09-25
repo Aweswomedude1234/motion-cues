@@ -9,7 +9,7 @@ namespace SteadyCues
 {
     internal static class Program
     {
-        public const string Website = "https://aweswomedude1234.github.io/motion-cues/";
+        public const string Website = "https://steadycues.vercel.app/";
         public const string Repository = "https://github.com/Aweswomedude1234/motion-cues";
         private const string MutexName = @"Local\SteadyCues.SingleInstance";
         public const string ShowEventName = @"Local\SteadyCues.Show";

@@ -4,20 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#0b1220">
+<meta name="theme-color" content="#202020">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="robots" content="noindex">
 <link rel="icon" href="icon.ico">
 <title>SteadyCues · Phone link</title>
 <style>
   :root {
-    --bg: #f6f7f9; --surface: #ffffff; --text: #0b1220; --muted: #5b6475; --border: #e3e6ec;
-    --accent: #0e7490; --accent-strong: #155e75; --accent-soft: #e0f2f7; --ok: #15803d; --warn: #b45309; --err: #b91c1c;
+    --bg: #f3f3f3; --surface: #ffffff; --text: #1b1b1b; --muted: #5f5f5f; --border: #e0e0e0;
+    --accent: #4a6340; --accent-strong: #3e5636; --accent-soft: #e4e9da; --ok: #4a6b3a; --warn: #9a6414; --err: #a8412b;
     --radius: 16px;
   }
   @media (prefers-color-scheme: dark) {
-    :root { --bg: #0b1220; --surface: #121a2b; --text: #eef1f6; --muted: #9aa4b6; --border: #253047;
-      --accent: #22d3ee; --accent-strong: #67e8f9; --accent-soft: #0f2a36; --ok: #4ade80; --warn: #fbbf24; --err: #f87171; }
+    :root { --bg: #202020; --surface: #2b2b2b; --text: #f3f3f3; --muted: #a3a3a3; --border: #3d3d3d;
+      --accent: #a9bd93; --accent-strong: #c8d8b4; --accent-soft: #2f3629; --ok: #9cc08a; --warn: #e0b15c; --err: #e0826b; }
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; background: var(--bg); color: var(--text);
@@ -35,8 +35,8 @@
   .steps li::before { content: counter(s); flex: 0 0 26px; height: 26px; border-radius: 50%; background: var(--accent-soft);
     color: var(--accent-strong); font-weight: 600; font-size: 14px; display: grid; place-items: center; }
   button { font: inherit; font-weight: 600; border: 0; border-radius: 999px; padding: 16px 20px; width: 100%; cursor: pointer; }
-  .primary { background: var(--accent); color: #fff; font-size: 18px; }
-  @media (prefers-color-scheme: dark) { .primary { color: #06202a; } }
+  .primary { background: var(--accent); color: #ffffff; font-size: 18px; }
+  @media (prefers-color-scheme: dark) { .primary { color: #1c1c1c; } }
   .secondary { background: transparent; color: var(--muted); border: 1px solid var(--border); margin-top: 10px; }
   .status { display: flex; align-items: center; gap: 10px; font-weight: 600; }
   .pip { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); flex: 0 0 auto; }

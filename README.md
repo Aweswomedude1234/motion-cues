@@ -8,7 +8,7 @@
 so what you see agrees with what you feel, and reading on the road is easier.
 
 [**Download for Windows**](https://github.com/Aweswomedude1234/motion-cues/releases/latest/download/SteadyCues.exe)
-&nbsp;·&nbsp; [Website](https://aweswomedude1234.github.io/motion-cues/)
+&nbsp;·&nbsp; [Website](https://steadycues.vercel.app/)
 &nbsp;·&nbsp; [Releases](https://github.com/Aweswomedude1234/motion-cues/releases)
 &nbsp;·&nbsp; [Report a problem](https://github.com/Aweswomedude1234/motion-cues/issues)
 
@@ -109,7 +109,7 @@ cd motion-cues
 ```
 
 The website (`website/`) is built with [Astryx](https://github.com/facebook/astryx), React and
-Vite. See [CONTRIBUTING.md](CONTRIBUTING.md).
+Vite. It is hosted on [Vercel](https://steadycues.vercel.app/) (project root: `website/`). See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ```
 src/SteadyCues/

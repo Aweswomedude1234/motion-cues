@@ -9,7 +9,7 @@ import {App} from './App';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Theme theme={steadyTheme} mode="system">
+    <Theme theme={steadyTheme} mode="light">
       <App />
     </Theme>
   </StrictMode>,

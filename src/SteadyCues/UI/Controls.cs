@@ -397,7 +397,7 @@ namespace SteadyCues.UI
             int quiet = 3, n = _qr.Size + 2 * quiet;
             int cell = Math.Max(1, Math.Min(Width, Height) / n);
             int ox = (Width - cell * _qr.Size) / 2, oy = (Height - cell * _qr.Size) / 2;
-            using (var b = new SolidBrush(Color.FromArgb(11, 18, 32)))
+            using (var b = new SolidBrush(Color.FromArgb(27, 27, 27)))
                 for (int y = 0; y < _qr.Size; y++)
                     for (int x = 0; x < _qr.Size; x++)
                         if (_qr[x, y]) g.FillRectangle(b, ox + x * cell, oy + y * cell, cell, cell);
@@ -463,16 +463,16 @@ namespace SteadyCues.UI
             var screen = new RectangleF(0.5f, 0.5f, Width - 1.5f, Height - 1.5f);
             using (var path = Theme.Round(screen, 8 * dpi))
             {
-                using (var b = new LinearGradientBrush(screen, Theme.Dark ? Theme.Hex(0x1E293B) : Theme.Hex(0xDCE7EE),
-                    Theme.Dark ? Theme.Hex(0x0F172A) : Theme.Hex(0xF3F6F9), 90f))
+                using (var b = new LinearGradientBrush(screen, Theme.Dark ? Theme.Hex(0x2A2A2A) : Theme.Hex(0xE6E6E6),
+                    Theme.Dark ? Theme.Hex(0x1F1F1F) : Theme.Hex(0xF5F5F5), 90f))
                     g.FillPath(b, path);
                 g.SetClip(path);
             }
             var win = new RectangleF(Width * 0.2f, Height * 0.16f, Width * 0.6f, Height * 0.68f);
             using (var path = Theme.Round(win, 6 * dpi))
-            using (var b = new SolidBrush(Theme.Dark ? Theme.Hex(0x273449) : Color.White))
+            using (var b = new SolidBrush(Theme.Dark ? Theme.Hex(0x363636) : Color.White))
                 g.FillPath(b, path);
-            using (var b = new SolidBrush(Theme.Dark ? Theme.Hex(0x334155) : Theme.Hex(0xE5E9EF)))
+            using (var b = new SolidBrush(Theme.Dark ? Theme.Hex(0x474747) : Theme.Hex(0xE3E3E3)))
                 for (int i = 0; i < 4; i++)
                     g.FillRectangle(b, win.X + win.Width * 0.1f, win.Y + win.Height * (0.22f + i * 0.17f), win.Width * (i == 3 ? 0.45f : 0.8f), 5 * dpi);
 
