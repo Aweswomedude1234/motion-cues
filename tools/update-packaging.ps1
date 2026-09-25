@@ -44,23 +44,23 @@ New-Item -ItemType Directory -Force $scoopDir | Out-Null
 }
 "@ + "`n", $utf8)
 
-# ---------------------------------------------------------------- winget (manifest schema 1.6)
+# ---------------------------------------------------------------- winget (manifest schema 1.12)
 $id = 'Aweswomedude1234.SteadyCues'
 $dir = Join-Path $root "packaging\winget\manifests\a\Aweswomedude1234\SteadyCues\$version"
 New-Item -ItemType Directory -Force $dir | Out-Null
 $H = $hash.ToUpper()
 
 [IO.File]::WriteAllText((Join-Path $dir "$id.yaml"), @"
-# yaml-language-server: `$schema=https://aka.ms/winget-manifest.version.1.6.0.schema.json
+# yaml-language-server: `$schema=https://aka.ms/winget-manifest.version.1.12.0.schema.json
 PackageIdentifier: $id
 PackageVersion: $version
 DefaultLocale: en-US
 ManifestType: version
-ManifestVersion: 1.6.0
+ManifestVersion: 1.12.0
 "@ + "`n", $utf8)
 
 [IO.File]::WriteAllText((Join-Path $dir "$id.installer.yaml"), @"
-# yaml-language-server: `$schema=https://aka.ms/winget-manifest.installer.1.6.0.schema.json
+# yaml-language-server: `$schema=https://aka.ms/winget-manifest.installer.1.12.0.schema.json
 PackageIdentifier: $id
 PackageVersion: $version
 InstallerType: exe
@@ -83,11 +83,11 @@ Installers:
   InstallerUrl: $url
   InstallerSha256: $H
 ManifestType: installer
-ManifestVersion: 1.6.0
+ManifestVersion: 1.12.0
 "@ + "`n", $utf8)
 
 [IO.File]::WriteAllText((Join-Path $dir "$id.locale.en-US.yaml"), @"
-# yaml-language-server: `$schema=https://aka.ms/winget-manifest.defaultLocale.1.6.0.schema.json
+# yaml-language-server: `$schema=https://aka.ms/winget-manifest.defaultLocale.1.12.0.schema.json
 PackageIdentifier: $id
 PackageVersion: $version
 PackageLocale: en-US
@@ -110,7 +110,7 @@ Tags:
 - overlay
 ReleaseNotesUrl: https://github.com/$Repo/releases/tag/v$version
 ManifestType: defaultLocale
-ManifestVersion: 1.6.0
+ManifestVersion: 1.12.0
 "@ + "`n", $utf8)
 
 Write-Host "Wrote Scoop and winget manifests for v$version (sha256 $hash)" -ForegroundColor Green

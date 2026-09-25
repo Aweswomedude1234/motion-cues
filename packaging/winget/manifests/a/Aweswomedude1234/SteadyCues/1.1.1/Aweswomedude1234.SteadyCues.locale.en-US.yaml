@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.6.0.schema.json
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.12.0.schema.json
 PackageIdentifier: Aweswomedude1234.SteadyCues
 PackageVersion: 1.1.1
 PackageLocale: en-US
@@ -21,4 +21,4 @@ Tags:
 - overlay
 ReleaseNotesUrl: https://github.com/Aweswomedude1234/motion-cues/releases/tag/v1.1.1
 ManifestType: defaultLocale
-ManifestVersion: 1.6.0
+ManifestVersion: 1.12.0
