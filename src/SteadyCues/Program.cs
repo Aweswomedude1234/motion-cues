@@ -1,0 +1,127 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
+using System.Windows.Forms;
+
+namespace SteadyCues
+{
+    internal static class Program
+    {
+        public const string Website = "https://aweswomedude1234.github.io/motion-cues/";
+        public const string Repository = "https://github.com/Aweswomedude1234/motion-cues";
+        private const string MutexName = @"Local\SteadyCues.SingleInstance";
+        public const string ShowEventName = @"Local\SteadyCues.Show";
+        public const string QuitEventName = @"Local\SteadyCues.Quit";
+
+        public static string Version
+        {
+            get
+            {
+                var a = (AssemblyInformationalVersionAttribute)Attribute.GetCustomAttribute(
+                    Assembly.GetExecutingAssembly(), typeof(AssemblyInformationalVersionAttribute));
+                return a != null ? a.InformationalVersion : "dev";
+            }
+        }
+
+        /// <summary>--loopback: phone link only listens on 127.0.0.1 (for development and tests).</summary>
+        public static bool LoopbackOnly;
+
+        [STAThread]
+        private static int Main(string[] args)
+        {
+            Func<string, bool> has = f => args.Any(a => string.Equals(a, f, StringComparison.OrdinalIgnoreCase));
+            LoopbackOnly = has("--loopback");
+
+            Native.EnableDpiAwareness();
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.ThreadException += (s, e) => Crash(e.Exception);
+            AppDomain.CurrentDomain.UnhandledException += (s, e) => Crash(e.ExceptionObject as Exception);
+
+            if (has("--uninstall"))
+            {
+                var answer = MessageBox.Show("Remove SteadyCues and its settings from this PC?", "Uninstall SteadyCues",
+                    MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+                if (answer != DialogResult.OK) return 1;
+                StopRunningInstance();
+                Installer.Uninstall();
+                MessageBox.Show("SteadyCues has been removed.", "SteadyCues", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return 0;
+            }
+
+            bool portable = has("--portable") || File.Exists(Path.Combine(Path.GetDirectoryName(Installer.CurrentExe), "portable.txt"));
+            if (!portable && !Installer.IsInstalledCopy)
+            {
+                // Downloaded copy: replace any running/older install, then run from the install folder.
+                StopRunningInstance();
+                if (Installer.Install())
+                {
+                    Installer.Relaunch("--show");
+                    return 0;
+                }
+                // Couldn't install (locked-down PC): carry on as a portable app.
+            }
+
+            bool created;
+            using (var mutex = new Mutex(true, MutexName, out created))
+            {
+                if (!created)
+                {
+                    if (!has("--background")) Signal(ShowEventName);
+                    return 0;
+                }
+                bool showWindow = !has("--background");
+                using (var app = new TrayApp(showWindow, has("--demo")))
+                    Application.Run(app);
+                GC.KeepAlive(mutex);
+            }
+            return 0;
+        }
+
+        private static void Signal(string name)
+        {
+            try
+            {
+                using (var ev = EventWaitHandle.OpenExisting(name)) ev.Set();
+            }
+            catch (WaitHandleCannotBeOpenedException) { }
+            catch (UnauthorizedAccessException) { }
+        }
+
+        /// <summary>Asks a running SteadyCues to exit and waits until it has.</summary>
+        private static void StopRunningInstance()
+        {
+            Signal(QuitEventName);
+            try
+            {
+                using (var m = new Mutex(false, MutexName))
+                {
+                    bool got;
+                    try { got = m.WaitOne(6000); }
+                    catch (AbandonedMutexException) { got = true; }
+                    if (got) m.ReleaseMutex();
+                }
+            }
+            catch { }
+        }
+
+        private static int _crashing;
+        private static void Crash(Exception ex)
+        {
+            if (Interlocked.Exchange(ref _crashing, 1) == 1) return;
+            string log = Path.Combine(Settings.Folder, "error.log");
+            try
+            {
+                Directory.CreateDirectory(Settings.Folder);
+                File.AppendAllText(log, DateTime.Now.ToString("u") + "  v" + Version + Environment.NewLine + ex + Environment.NewLine + Environment.NewLine);
+            }
+            catch { }
+            MessageBox.Show("SteadyCues ran into a problem and needs to close.\n\n" + (ex != null ? ex.Message : "Unknown error") +
+                            "\n\nDetails were saved to " + log + ". Please include them if you report the issue.",
+                "SteadyCues", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            Environment.Exit(1);
+        }
+    }
+}

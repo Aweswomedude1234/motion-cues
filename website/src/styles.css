@@ -1,0 +1,63 @@
+/* Page-level glue only. Components come from Astryx; colors, spacing and radii are its tokens. */
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body { background: var(--color-background-surface); }
+
+/* Centered content column. */
+.page {
+  width: 100%;
+  max-width: 1120px;
+  margin-inline: auto;
+  padding-inline: var(--spacing-6);
+  scroll-margin-top: 72px;
+}
+@media (max-width: 640px) { .page { padding-inline: var(--spacing-4); } }
+
+.logo { display: block; border-radius: 22%; }
+
+.hero-demo { width: 100%; max-width: 880px; margin-inline: auto; }
+
+/* The pretend laptop screen the live demo draws into. */
+.demo-screen {
+  aspect-ratio: 16 / 10;
+  width: 100%;
+  border-radius: var(--radius-container);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  --demo-desktop: light-dark(#e8edf2, #17181b);
+  --demo-window: light-dark(#ffffff, #25262a);
+  --demo-line: light-dark(#e2e6eb, #36383d);
+}
+/* The canvas reads these three resolved colors back when drawing. */
+.demo-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: var(--demo-desktop);
+  color: var(--demo-window);
+  border: 0 solid var(--demo-line);
+}
+
+.feature-icon {
+  display: inline-grid;
+  place-items: center;
+  width: var(--size-element-lg);
+  height: var(--size-element-lg);
+  border-radius: var(--radius-element);
+  background: var(--color-background-muted);
+}
+
+.shot { margin: 0; display: grid; gap: var(--spacing-3); justify-items: center; }
+.shot img {
+  display: block;
+  width: 100%;
+  max-width: 380px;
+  height: auto;
+  border-radius: var(--radius-container);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 12px 32px var(--color-shadow);
+}
+
+.footer { padding-block: var(--spacing-10); }

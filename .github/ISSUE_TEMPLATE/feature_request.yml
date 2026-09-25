@@ -1,0 +1,15 @@
+name: Idea or feature request
+description: Suggest an improvement
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What would make SteadyCues better for you?
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Anything else?
+      description: How you travel, what device you use, screenshots or sketches.

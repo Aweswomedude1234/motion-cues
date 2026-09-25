@@ -1,0 +1,37 @@
+name: Bug report
+description: Something doesn't work as expected
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: SteadyCues version
+      description: Shown on the Settings tab under About.
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: source
+    attributes:
+      label: Motion source
+      options: [This PC's sensor, Phone, GPS, Demo drive, Not sure]
+    validations:
+      required: true
+  - type: input
+    id: hardware
+    attributes:
+      label: PC, phone and browser
+      placeholder: "Surface Pro 9, Windows 11 24H2 / Pixel 8, Chrome"
+  - type: textarea
+    id: log
+    attributes:
+      label: Error log
+      description: If SteadyCues crashed, paste the contents of %APPDATA%\SteadyCues\error.log.
+      render: text
